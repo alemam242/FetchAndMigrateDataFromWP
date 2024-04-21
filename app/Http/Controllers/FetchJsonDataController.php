@@ -3,36 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\FetchApiJob;
-use Illuminate\Http\Request;
 use App\Jobs\FetchCategoriesJob;
-use Illuminate\Support\Facades\Storage;
 
 class FetchJsonDataController extends Controller
 {
-    public function showPosts(){
+    public function showPosts()
+    {
         $data = json_decode(file_get_contents(storage_path('jsonData.json')), true);
+$data = array_reverse($data);
 
-        return response()->json([
-            "total"=>count($data),
-            "data"=>$data
-        ]);
+$uniqueData = [];
+$duplicateObjects = [];
+
+foreach ($data as $item) {
+    $serializedItem = serialize($item);
+    if (!in_array($serializedItem, $uniqueData)) {
+        $uniqueData[] = $serializedItem;
+    } else {
+        $duplicateObjects[] = $item;
     }
-    public function showCategories(){
+}
+
+return response()->json([
+    "total" => count($data),
+    'duplicate' => count($duplicateObjects),
+    'duplicate_objects' => $duplicateObjects,
+    "data" => $data,
+]);
+
+    }
+    public function showCategories()
+    {
         $data = json_decode(file_get_contents(storage_path('jsonCategories.json')), true);
 
         return response()->json([
-            "total"=>count($data),
-            "data"=>$data
+            "total" => count($data),
+            "data" => $data,
         ]);
     }
 
-    function storePost(){
-        for ($page = 1; $page <= 215; $page++) {
+    public function storePost()
+    {
+        for ($page = 65; $page <= 215; $page++) {
             FetchApiJob::dispatch($page);
         }
     }
 
-    function storeCategory(){
+    public function storeCategory()
+    {
         for ($page = 1; $page <= 3; $page++) {
             FetchCategoriesJob::dispatch($page);
         }

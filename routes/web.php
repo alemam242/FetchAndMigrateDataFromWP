@@ -19,13 +19,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
+// Show the fetched data
 Route::get("/posts",[FetchJsonDataController::class,"showPosts"])->name("showJsonData");
 Route::get("/categories",[FetchJsonDataController::class,"showCategories"])->name("showJsonData");
+
+// Fetch Data
 Route::get("/store-post",[FetchJsonDataController::class,"storePost"])->name("storeJsonData");
 Route::get("/store-category",[FetchJsonDataController::class,"storeCategory"])->name("storeJsonData");
 
-
-// Sample Test
+// Migration the fetched data to Database
 Route::get("/migrate-post",[TestMigrateController::class,"migratePost"]);
 Route::get("/migrate-category",[TestMigrateController::class,"migrateCategory"]);
