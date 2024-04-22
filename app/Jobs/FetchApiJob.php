@@ -29,10 +29,23 @@ class FetchApiJob implements ShouldQueue
             $jsonData = $response->json();
 
             foreach ($jsonData as $key => $value) {
-                $imageDetailsLink = $value["_links"]["wp:featuredmedia"][0]["href"];
+                if (isset($value["_links"]["wp:featuredmedia"][0]["href"])) {
+                    $imageDetailsLink = $value["_links"]["wp:featuredmedia"][0]["href"];
+                } elseif (isset($value["_links"]["wp:attachment"][0]["href"])) {
+                    $imageDetailsLink = $value["_links"]["wp:attachment"][0]["href"];
+                } else {
+                    $imageDetailsLink = "";
+                }
 
                 $imageDetailsJson = json_decode(file_get_contents($imageDetailsLink), true);
-                $imageName = $imageDetailsJson["media_details"]["file"];
+
+                if (isset($value["_links"]["wp:featuredmedia"][0]["href"])) {
+                    $imageName = $imageDetailsJson["media_details"]["file"];
+                } elseif (isset($value["_links"]["wp:attachment"][0]["href"])) {
+                    $imageName = $imageDetailsJson[0]["media_details"]["file"];
+                } else {
+                    $imageName = "";
+                }
 
                 $data[] = [
                     'date' => $value['date'],
@@ -45,7 +58,7 @@ class FetchApiJob implements ShouldQueue
                 ];
             }
 
-            $filePath = storage_path('jsonData.json');
+            $filePath = storage_path('PostData.json');
 
             if (File::exists($filePath)) {
                 $existingData = json_decode(File::get($filePath), true);

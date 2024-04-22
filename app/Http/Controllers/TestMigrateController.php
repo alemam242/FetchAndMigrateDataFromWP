@@ -13,7 +13,7 @@ class TestMigrateController extends Controller
     public function migratePost(Request $request)
     {
         // $data = json_decode(File::get(\storage_path("smallJsonData.json")), true);
-        $data = json_decode(File::get(\storage_path("jsonData.json")), true);
+        $data = json_decode(File::get(\storage_path("PostData.json")), true);
 
         // store category_id into post_term table
         foreach ($data as $value) {

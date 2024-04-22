@@ -15,13 +15,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [FetchJsonDataController::class, 'index']);
 
 // Show the fetched data
 Route::get("/posts",[FetchJsonDataController::class,"showPosts"])->name("showJsonData");
 Route::get("/categories",[FetchJsonDataController::class,"showCategories"])->name("showJsonData");
+
+// Check duplicates
+Route::get("/duplicates",[FetchJsonDataController::class,"findDuplicates"]);
 
 // Fetch Data
 Route::get("/store-post",[FetchJsonDataController::class,"storePost"])->name("storeJsonData");
