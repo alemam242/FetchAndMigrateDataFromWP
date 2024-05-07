@@ -12,7 +12,7 @@ class FetchJsonDataController extends Controller
 {
     public function index(){
         $id = rand(299, 2458);
-        $data = DB::table('posts')->where('id', 1018)->first();
+        $data = DB::table('posts')->where('id', $id)->first();
 //        return response()->json($data);
         return view('welcome', compact('data'));
     }
@@ -47,9 +47,9 @@ class FetchJsonDataController extends Controller
             FetchApiJob::dispatch($page);
         }
         */
-//        for ($page = 1; $page <= 215; $page++) {
-            //FetchApiJob::dispatch(91);
-  //      }
+       for ($page = 216; $page <= 218; $page++) {
+            FetchApiJob::dispatch($page);
+       }
     }
 
     public function storeCategory()

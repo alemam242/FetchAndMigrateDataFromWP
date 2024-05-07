@@ -38,6 +38,15 @@ class TestMigrateController extends Controller
                     'updated_at' => now(),
                 ]);
 
+                $transId = DB::table('translations')->insertGetId([
+                    'value' => '{"en":'.$postId.'}'
+                ]);
+
+                DB::table('post_translations')->insert([
+                    'post_id' => $postId,
+                    'translation_id' => $transId,
+                ]);
+
                 // Finish the transaction
                 DB::commit();
             } catch (Exception $e) {
@@ -86,5 +95,52 @@ class TestMigrateController extends Controller
             "message" => "Data has been migrated successfully.",
             "data" => $data,
         ]);
+    }
+
+    public function deleteDuplicatePosts(){
+        //
+        $result = DB::table('posts')
+            ->select(DB::raw('MIN(id) as id'), 'post_title')
+            ->groupBy('post_title')
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        //$this->deletePost($result);
+
+        $data = [];
+        foreach ($result as $value) {
+            $data[] = DB::table('posts')
+                ->where('post_title', 'LIKE', $value->post_title)
+                ->where('id', '!=', $value->id)
+                ->get();
+        }
+        $this->deletePost($data);
+        return response()->json([
+            "status" => "success",
+            "message" => "count = ".count($result),
+            "data" => $data,
+        ]);
+    }
+
+    function deletePost($result){
+        DB::beginTransaction();
+        foreach ($result as $value) {
+            foreach ($value as $item) {
+                DB::table('posts')
+                    ->where('id', $item->id)
+                    ->delete();
+
+                DB::table('post_term')
+                    ->where('post_id', $item->id)
+                    ->delete();
+            }
+            /*
+            DB::table('posts')
+                ->where('post_title', 'LIKE', $value->post_title)
+                ->where('id', '!=', $value->id)
+                ->delete();
+            */
+        }
+        DB::commit();
     }
 }

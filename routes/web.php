@@ -22,7 +22,7 @@ Route::get("/posts",[FetchJsonDataController::class,"showPosts"])->name("showJso
 Route::get("/categories",[FetchJsonDataController::class,"showCategories"])->name("showJsonData");
 
 // Check duplicates
-Route::get("/duplicates",[FetchJsonDataController::class,"findDuplicates"]);
+Route::get("/duplicates",[TestMigrateController::class,"deleteDuplicatePosts"]);
 
 // Fetch Data
 Route::get("/store-post",[FetchJsonDataController::class,"storePost"])->name("storeJsonData");
